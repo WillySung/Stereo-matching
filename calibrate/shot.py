@@ -21,7 +21,7 @@ def snap_shot(pos,frame):
     filename = pos + "_" + str(counter) + ".jpg"
 
     cv2.imwrite(filename,frame)
-    print(filename + " saved:")
+    print(filename + " saved.")
 
 while True:
     ret, left_frame = left_camera.read()
