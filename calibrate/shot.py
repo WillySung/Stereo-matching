@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 import time
 
 AUTO = False  #set ture to auto snap shot
@@ -11,6 +12,8 @@ cv2.moveWindow("right",800,0)
 
 left_camera = cv2.VideoCapture(0)
 right_camera = cv2.VideoCapture(1)
+imgL = np.zeros((480,640,3),np.uint8)
+imgR = np.zeros((480,640,3),np.uint8)
 
 counter = 0
 utc = time.time()
@@ -18,14 +21,14 @@ pattern = (8,6)   #the size of chessboard
 
 def snap_shot(pos,frame):
     global counter
-    filename = pos + "_" + str(counter) + ".jpg"
+    filename = pos + str(counter) + ".jpg"
 
     cv2.imwrite(filename,frame)
     print(filename + " saved.")
 
 while True:
-    ret, left_frame = left_camera.read()
-    ret, right_frame = right_camera.read()
+    ret, left_frame = left_camera.read(imgL)
+    ret, right_frame = right_camera.read(imgR)
 
     cv2.imshow("left", left_frame)
     cv2.imshow("right", right_frame)

@@ -10,8 +10,11 @@ imgR = np.zeros((480,640,3),np.uint8)
 while(True):
      capL.read(imgL)
      capR.read(imgR)
-     gray_l = cv2.pyrDown(cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY))
-     gray_r = cv2.pyrDown(cv2.cvtColor(imgR, cv2.COLOR_BGR2GRAY))
+     gray_l = cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY)
+     gray_r = cv2.cvtColor(imgR, cv2.COLOR_BGR2GRAY)
+    
+     gray_l = cv2.pyrDown(cv2.GaussianBlur(cv2.equalizeHist(gray_l),(5,5),0))
+     gray_r = cv2.pyrDown(cv2.GaussianBlur(cv2.equalizeHist(gray_r),(5,5),0))
 
      '''#for single image
      gray_l = cv2.imread('aloeL.jpg',0)
@@ -38,12 +41,16 @@ while(True):
 
      stereo = cv2.StereoBM_create(numDisparities=16, blockSize=15)
      disp = stereo.compute(gray_l,gray_r)  
+     disp = cv2.normalize(disp,disp, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
 
      #disp = stereo.compute(gray_l,gray_r).astype(np.float32) / 16.0    
 
      cv2.imshow('gray_l',gray_l)
+     cv2.moveWindow('gray_l',0,0)
      cv2.imshow('gray_r',gray_r)
+     cv2.moveWindow('gray_r',500,0)
      cv2.imshow('disp', disp/255)
+     cv2.moveWindow('disp',1000,0)
      
      if cv2.waitKey(1) & 0xFF == ord('q'): break 
 
