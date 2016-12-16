@@ -32,16 +32,16 @@ for fname in images:
 
         # Draw and display the corners
         imgL = cv2.drawChessboardCorners(imgL, (8,6), corners2L,ret)
-        cv2.imshow('imgL',imgL)
+        #cv2.imshow('imgL',imgL)
 
         #calibrate
-        ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpointsL, imgpointsL, grayL.shape[::-1], None, None)
-        print("camera matrix:\n", mtx)
-        print("distortion coefficients:", dist.ravel())
-        print(rvecs)
-        print(tvecs)
+        #ret, mtxL, distL, rvecs, tvecs = cv2.calibrateCamera(objpointsL, imgpointsL, grayL.shape[::-1], None, None)
+        #print("camera matrix:\n", mtx)
+        #print("distortion coefficients:", dist.ravel())
+        #print(rvecs)
+        #print(tvecs)
 
-        cv2.waitKey(500)
+        #cv2.waitKey(500)
 
 images = glob.glob('right*.jpg')
 for fname in images:
@@ -60,15 +60,27 @@ for fname in images:
 
         # Draw and display the corners
         imgR = cv2.drawChessboardCorners(imgR, (8,6), corners2R,ret)
-        cv2.imshow('imgR',imgR)
+        #cv2.imshow('imgR',imgR)
 
         #calibrate
-        ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpointsR, imgpointsR, grayR.shape[::-1], None, None)
-        print("camera matrix:\n", mtx)
-        print("distortion coefficients:", dist.ravel())
-        print(rvecs)
-        print(tvecs)
+        #ret, mtxR, distR, rvecs, tvecs = cv2.calibrateCamera(objpointsR, imgpointsR, grayR.shape[::-1], None, None)
+        #print("camera matrix:\n", mtx)
+        #print("distortion coefficients:", dist.ravel())
+        #print(rvecs)
+        #print(tvecs)
 
-        cv2.waitKey(500)
+        #cv2.waitKey(500)
 
+cameraMatrix1=np.array([[ 813.35575191,    0,          319.5871186 ],
+                        [   0,          812.35926825,  243.55937314],
+                        [   0,            0,            1        ]])
+distCoeffs1=np.array([  2.07238902e-02,  -1.25611219e+00,   1.87849802e-03,  -4.28683753e-03,   7.11584927e+00])
+cameraMatrix2=np.array([[ 817.28725852,    0,          317.534018  ],
+                        [   0,          817.96578394,  251.73937654],
+                        [   0,            0,            1        ]])
+distCoeffs2=np.array([  1.42707517e-01,  -4.24991627e+00,  -1.37642002e-04,  -8.93958825e-03,   2.93141784e+01])
+flags = (cv2.CALIB_FIX_ASPECT_RATIO + cv2.CALIB_ZERO_TANGENT_DIST + cv2.CALIB_SAME_FOCAL_LENGTH)
+retval,cameraMatrix1,distCoeffs1,cameraMatrix2,distCoeffs2,R,T,E,F = cv2.stereoCalibrate(objpointsL,imgpointsL, imgpointsR,cameraMatrix1,distCoeffs1,cameraMatrix2,distCoeffs2, (640,480))
+print(R)
+print(T)
 cv2.destroyAllWindows()
