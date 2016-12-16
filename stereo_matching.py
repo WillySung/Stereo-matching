@@ -1,28 +1,54 @@
 # -*- coding: utf-8 -*-
 import cv2
 import numpy as np
+import camera_config
+
+cv2.namedWindow("left")
+cv2.namedWindow("right")
+cv2.namedWindow("depth")
+cv2.moveWindow('left',0,0)
+cv2.moveWindow('right',300,0)
+cv2.moveWindow('depth',600,0)
+cv2.createTrackerbar('num', 'depth', 0, 10, lambda x:None)
+cv2.createTrackerbar('blockSize', 'depth', 5, 255, lambda x:None)
 
 capL = cv2.VideoCapture(0)
 capR = cv2.VideoCapture(1)
 imgL = np.zeros((480,640,3),np.uint8)
 imgR = np.zeros((480,640,3),np.uint8)
 
+def callbackFunc(e,x,y,f,p):
+    if e == cv2.EVENT_LBUTTONDOWN:
+       print(threeD[y][x])
+cv2.setMouseCallback("depth", callbackFunc, None)
+
 while(True):
      capL.read(imgL)
      capR.read(imgR)
-     gray_l = cv2.cvtColor(imgL, cv2.COLOR_BGR2GRAY)
-     gray_r = cv2.cvtColor(imgR, cv2.COLOR_BGR2GRAY)
+
+     imgL_rectified = cv2.remap(imgL, camera_config.left_map1, camera_config.left_map2, cv2.INTER_LINEAR)
+     imgR_rectified = cv2.remap(imgR, camera_config.right_map1, camera_config.right_map2, cv2.INTER_LINEAR)
+
+     gray_l = cv2.cvtColor(imgL_rectified, cv2.COLOR_BGR2GRAY)
+     gray_r = cv2.cvtColor(imgR_rectified, cv2.COLOR_BGR2GRAY)
     
      gray_l = cv2.pyrDown(cv2.GaussianBlur(cv2.equalizeHist(gray_l),(5,5),0))
      gray_r = cv2.pyrDown(cv2.GaussianBlur(cv2.equalizeHist(gray_r),(5,5),0))
+
+     # use two trackbar to adjust parameters
+     num = cv2.getTrackbarPos("num", "depth")
+     blockSize = cv2.getTrackbarPos("blockSize", "depth")
+     if blockSize %2 == 0:
+         blockSize += 1
+     if blockSize < 5:
+         blockSize = 5
 
      '''#for single image
      gray_l = cv2.imread('aloeL.jpg',0)
      gray_r = cv2.imread('aloeR.jpg',0)
      gray_l = cv2.pyrDown(gray_l)  # downscale images for faster processing
      gray_r = cv2.pyrDown(gray_r)
-     '''
-     '''
+     
      #StereoSGBM setting
      window_size = 5
      min_disp = 16
@@ -39,18 +65,14 @@ while(True):
         speckleRange = 32,         
      )'''
 
-     stereo = cv2.StereoBM_create(numDisparities=16, blockSize=15)
+     stereo = cv2.StereoBM_create(numDisparities=16*num, blockSize=blockSize)
      disp = stereo.compute(gray_l,gray_r)  
      disp = cv2.normalize(disp,disp, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+     threeD = cv2.reprojectImageTo3D(disp.astype(np.float32)/16., camera_config.Q)     
 
-     #disp = stereo.compute(gray_l,gray_r).astype(np.float32) / 16.0    
-
-     cv2.imshow('gray_l',gray_l)
-     cv2.moveWindow('gray_l',0,0)
-     cv2.imshow('gray_r',gray_r)
-     cv2.moveWindow('gray_r',500,0)
-     cv2.imshow('disp', disp/255)
-     cv2.moveWindow('disp',1000,0)
+     cv2.imshow('left',imgL_rectified)
+     cv2.imshow('right',imgR_rectified)
+     cv2.imshow('depth', disp)
      
      if cv2.waitKey(1) & 0xFF == ord('q'): break 
 
