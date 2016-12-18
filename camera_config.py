@@ -13,15 +13,10 @@ right_camera_matrix = np.array([[ 817.28725852,    0,          317.534018  ],
 
 right_distortion = np.array([  1.42707517e-01,  -4.24991627e+00,  -1.37642002e-04,  -8.93958825e-03,   2.93141784e+01])
 
-left_rotation_vector = np.array([ 0.03944465,  0.20144,    1.52740131])
-right_rotation_vector = np.array([ 0.43235342,  0.09365809, -0.41773828])
-left_translation_vector = np.array([  5.62233136,  -2.98129403,  25.81993809])
-right_translation_vector = np.array([ -3.29689611,  -1.03348628,  21.56224497])
-
-rvec1 = cv2.Rodrigues(left_rotation_vector)[0]
-rvec2 = cv2.Rodrigues(right_rotation_vector)[0]
-R = cv2.Rodrigues(rvec2*rvec1)[0]
-T = np.float32(rvec2*left_translation_vector + right_translation_vector)
+R = np.array([[ 0.55203161, -0.05852514, 0.83176674],
+             [-0.13085881,  0.97909187, 0.1557404 ],
+             [-0.82349079, -0.19481763, 0.53283113]])
+T = np.array([-20.71161089,  -3.72345748, 12.57491925])
 
 size = (640,480)
 
